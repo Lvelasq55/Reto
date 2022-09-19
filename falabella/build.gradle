@@ -1,0 +1,61 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'net.serenity-bdd.aggregator'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group 'org.siigo'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+ext {
+    serenityCoreVersion = '3.3.4'
+    serenityCucumberVersion = "3.3.4"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.2.12")
+        classpath "net.serenity-bdd:serenity-single-page-report:2.4.34"
+    }
+}
+
+serenity {
+    reports = ["single-page-html"]
+}
+
+dependencies {
+    implementation "net.serenity-bdd:serenity-core:${serenityCoreVersion}"
+    implementation "net.serenity-bdd:serenity-junit:${serenityCoreVersion}"
+    implementation "net.serenity-bdd:serenity-cucumber:${serenityCucumberVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay:${serenityCoreVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:${serenityCoreVersion}"
+    implementation group: 'io.rest-assured', name: 'json-schema-validator', version: '4.4.0'
+
+    testImplementation "net.serenity-bdd:serenity-core:${serenityCoreVersion}"
+    testImplementation "net.serenity-bdd:serenity-junit:${serenityCoreVersion}"
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.assertj:assertj-core:3.23.1'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '2.0.0-alpha1'
+}
+
+test {
+    systemProperties(System.getProperties())
+}
+
+gradle.startParameter.continueOnFailure = true
+test.finalizedBy(aggregate, reports)
